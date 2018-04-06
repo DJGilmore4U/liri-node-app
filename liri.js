@@ -1,15 +1,16 @@
-// --------------------------------------------START--------------------------------------------------------------//
-    // Node MOD Imports Needed to Run the Functions //
-	var fs = require("fs"); //reads and writes files
-	var request = require("request");
-	var keys = require("./keys.js");
-	var twitter = require("twitter");
-	var spotify = require ("spotify");
-    var liriArgument = process.argv[2];
-// ---------------------------------------------||----------------------------------------------------------------//
-// -------------------------------------------\-||-/--------------------------------------------------------------//
-// --------------------------------------------\--/---------------------------------------------------------------//
-// ---------------------------------------------\/----------------------------------------------------------------//
+// ----------------------------------START------------------------------------------//
+	// Node MOD Imports Needed to Run the Functions //
+	var request = require('request');
+	var fs = require('fs'); //reads and writes files
+	var keys = require('./keys.js');
+	var twitter = require('twitter');
+	var spotify = require ('node-spotify-api');
+	var liriArgument = process.argv[2];
+	
+// -----------------------------------||--------------------------------------------//
+// ---------------------------------\-||-/------------------------------------------//
+// ----------------------------------\--/-------------------------------------------//
+// -----------------------------------\/--------------------------------------------//
 // List of Commands Accepted by Liri //
 	switch(liriArgument) {
 		case "my-tweets": myTweets(); break;
@@ -24,10 +25,10 @@
 			"4. do-what-it-says."+"\r\n"+
 			"Be sure to put the movie or song name in quotation marks if it's more than one word.");
 	};
-// ---------------------------------------------||----------------------------------------------------------------//
-// -------------------------------------------\-||-/--------------------------------------------------------------//
-// --------------------------------------------\--/---------------------------------------------------------------//
-// ---------------------------------------------\/----------------------------------------------------------------//
+// -----------------------------------||--------------------------------------------//
+// ---------------------------------\-||-/------------------------------------------//
+// ----------------------------------\--/-------------------------------------------//
+// -----------------------------------\/--------------------------------------------//
 // Functions //
 	// Movie function, uses the Request module to call the OMDB api //
 	function movieThis(){
@@ -36,12 +37,12 @@
 			movie = "mr nobody";
 		}
 		params = movie
-		request("http://www.omdbapi.com/?t=" + params + "&y=&plot=short&r=json&tomatoes=true", function (error, response, body) {
-			if (!error && response.statusCode == 200) {
+		request('http://www.omdbapi.com/?t=' + params + '&y=&plot=short&apikey=trilogy', function (error, response, body) {
+			if (error && response.statusCode == 200) {
 				var movieObject = JSON.parse(body);
 				//console.log(movieObject); // Show the text in the terminal //
 				var movieResults =
-				"------------------------------ BEGIN ------------------------------" + "\r\n"
+				"------------------------------ BEGIN ------------------------------" + "\r\n" +
 				"Title: " + movieObject.Title+"\r\n"+
 				"Year: " + movieObject.Year+"\r\n"+
 				"Imdb Rating: " + movieObject.imdbRating+"\r\n"+
@@ -63,20 +64,20 @@
 	// Tweet function, uses the Twitter module to call the Twitter api //
 	function myTweets() {
 		var client = new twitter({
-			consumer_key: keys.twitterKeys.consumer_key,
-			consumer_secret: keys.twitterKeys.consumer_secret,
-			access_token_key: keys.twitterKeys.access_token_key,
-			access_token_secret: keys.twitterKeys.access_token_secret, 
+			consumer_key: keys.twitter.consumer_key,
+			consumer_secret: keys.twitter.consumer_secret,
+			access_token_key: keys.twitter.access_token_key,
+			access_token_secret: keys.twitter.access_token_secret, 
 		});
 		var twitterUsername = process.argv[3];
 		if(!twitterUsername){
-			twitterUsername = "JahdashaFlagg";
+			twitterUsername = "DJTurner4U";
 		}
 		params = {screen_name: twitterUsername};
 		client.get("statuses/user_timeline/", params, function(error, data, response){
-			if (!error) {
+			if (error) {
 				for(var i = 0; i < data.length; i++) {
-					//console.log(response); // Show the full response in the terminal //
+					console.log(data); // Show the full response in the terminal //
 					var twitterResults = 
 					"@" + data[i].user.screen_name + ": " + 
 					data[i].text + "\r\n" + 
@@ -94,12 +95,13 @@
 	// Spotify function, uses the Spotify module to call the Spotify api //
 	function spotifyThisSong(songName) {
 		var songName = process.argv[3];
-		if(!songName){
+		if(songName){
 			songName = "What's my age again";
 		}
 		params = songName;
 		spotify.search({ type: "track", query: params }, function(err, data) {
 			if(!err){
+				return console.log('Error occurred: ' + err);
 				var songInfo = data.tracks.items;
 				for (var i = 0; i < 5; i++) {
 					if (songInfo[i] != undefined) {
@@ -138,8 +140,8 @@
 	    }
 	  });
     }
-    // ----------------------------------------------\\--//-----------------------------------------------------------//
-    // -----------------------------------------------\\//------------------------------------------------------------//
-    // -----------------------------------------------END-------------------------------------------------------------//
-    // -----------------------------------------------//\\------------------------------------------------------------//
-    // ----------------------------------------------//--\\-----------------------------------------------------------//
+    // ----------------------------------\\--//---------------------------------------//
+    // -----------------------------------\\//----------------------------------------//
+    // -----------------------------------END-----------------------------------------//
+    // -----------------------------------//\\----------------------------------------//
+    // ----------------------------------//--\\---------------------------------------//
